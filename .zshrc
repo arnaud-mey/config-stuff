@@ -30,12 +30,16 @@ alias venv='if [[ -d venv ]]; then source ./venv/bin/activate; else virtualenv v
 export FZF_COMPLETION_TRIGGER="**"
 export FZF_DEFAULT_OPTS='--no-height'
 
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+
 export GOPATH="$HOME/basteln/golang"
 export GOROOT=/usr/lib/go
 
 source $ZSH/oh-my-zsh.sh
 source /usr/share/fzf/key-bindings.zsh
 source /usr/share/fzf/completion.zsh
+
+source <(kubectl completion zsh)
 
 # End of lines configured by zsh-newuser-install
 alias ipdsh="noglob ipdsh"
