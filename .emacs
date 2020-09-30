@@ -40,7 +40,7 @@
  '(package-selected-packages
    (quote
     (find-file-in-project all-the-icons neotree jedi terraform-mode mmm-mode salt-mode puppet-mode)))
-
+(global-flycheck-mode)
 (require 'all-the-icons)
 (require 'neotree)
 (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
