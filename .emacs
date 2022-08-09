@@ -10,8 +10,11 @@
    kept-new-versions 6
    kept-old-versions 2
    version-control t)       ; use versioned backups
-(setq auto-save-default nil)
+
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
+(setq auto-save-file-name-transforms
+      `((".*" "~/.emacs-saves/" t)))
+(setq create-lockfiles nil)
 (require 'package) ;;
 (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
                     (not (gnutls-available-p))))
@@ -51,8 +54,7 @@
  ;; If there is more than one, they won't work right.
  '(inhibit-startup-screen t)
  '(package-selected-packages
-   (quote
-    (gorepl-mode go-mode terraform-mode kubernetes magit diff-hl treemacs-evil treemacs which-key yaml-mode so-long puppet-mode neotree jedi find-file-in-project all-the-icons))))
+   '(undo-tree projectile gorepl-mode go-mode terraform-mode kubernetes magit diff-hl treemacs-evil treemacs which-key yaml-mode so-long puppet-mode neotree jedi find-file-in-project all-the-icons)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -60,18 +62,23 @@
  ;; If there is more than one, they won't work right.
  )
 
-(defun neotree-project-dir ()
-  "Open NeoTree using the git root."
-  (interactive)
-  (let ((project-dir (ffip-project-root))
-        (file-name (buffer-file-name)))
-    (if project-dir
-        (progn
-          (neotree-dir project-dir)
-          (neotree-find file-name))
-      (message "Could not find git project root."))))
+  (defun neotree-project-dir ()
+    "Open NeoTree using the git root."
+    (interactive)
+    (let ((project-dir (projectile-project-root))
+          (file-name (buffer-file-name)))
+      (neotree-toggle)
+      (if project-dir
+          (if (neo-global--window-exists-p)
+              (progn
+                (neotree-dir project-dir)
+                (neotree-find file-name)))
+        (message "Could not find git project root."))))
 
 (global-set-key [f8] 'neotree-project-dir)
+
+(setq projectile-switch-project-action 'neotree-projectile-action)
+
 ;; Show matching parens
 (setq show-paren-delay 0)
 (show-paren-mode 1)
@@ -99,3 +106,15 @@
 	    (diff-hl-flydiff-mode 1))
 
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+
+(projectile-mode +1)
+;; Recommended keymap prefix on Windows/Linux
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+(setq-default neo-show-hidden-files t)
+(setq neo-window-width 60)
+
+(setq mac-option-key-is-meta t)
+(setq mac-right-option-modifier nil)
+(global-undo-tree-mode)
+(setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
