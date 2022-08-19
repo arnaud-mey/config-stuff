@@ -2,6 +2,16 @@
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
+
+;; Align with spaces only
+(defadvice align-regexp (around align-regexp-with-spaces)
+  "Never use tabs for alignment."
+  (let ((indent-tabs-mode nil))
+    ad-do-it))
+(ad-activate 'align-regexp)
+
+
+
 (setq
    backup-by-copying t      ; don't clobber symlinks
    backup-directory-alist
@@ -45,8 +55,8 @@
     (find-file-in-project all-the-icons neotree jedi terraform-mode mmm-mode salt-mode puppet-mode)))
 (global-flycheck-mode)
 (require 'all-the-icons)
-(require 'neotree)
-(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+;;(require 'neotree)
+;;(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -62,22 +72,149 @@
  ;; If there is more than one, they won't work right.
  )
 
-  (defun neotree-project-dir ()
-    "Open NeoTree using the git root."
-    (interactive)
-    (let ((project-dir (projectile-project-root))
-          (file-name (buffer-file-name)))
-      (neotree-toggle)
-      (if project-dir
-          (if (neo-global--window-exists-p)
-              (progn
-                (neotree-dir project-dir)
-                (neotree-find file-name)))
-        (message "Could not find git project root."))))
+;;   (defun neotree-project-dir ()
+;;     "Open NeoTree using the git root."
+;;     (interactive)
+;;     (let ((project-dir (projectile-project-root))
+;;           (file-name (buffer-file-name)))
+;;       (neotree-toggle)
+;;       (if project-dir
+;;           (if (neo-global--window-exists-p)
+;;               (progn
+;;                 (neotree-dir project-dir)
+;;                 (neotree-find file-name)))
+;;         (message "Could not find git project root."))))
 
-(global-set-key [f8] 'neotree-project-dir)
+;; (global-set-key [f8] 'neotree-project-dir)
 
-(setq projectile-switch-project-action 'neotree-projectile-action)
+;; (setq projectile-switch-project-action 'neotree-projectile-action)
+
+(use-package terraform-mode
+  :ensure t
+  :custom
+  (terraform-mode t)
+)
+
+
+(use-package treemacs
+  :ensure t
+  :defer t
+  :bind
+  ([f7] . treemacs)
+  :custom
+  (treemacs-collapse-dirs                   3)
+  (treemacs-deferred-git-apply-delay        0.5)
+  (treemacs-file-follow-delay               0.2)
+  (treemacs-hide-dot-git-directory          t)
+  (treemacs-indentation                     2)
+  (treemacs-indentation-string              " ")
+  (treemacs-missing-project-action          'ask)
+  (treemacs-no-png-images                   t)
+	;; If true: keep only current project expanded and all others closed.
+  (treemacs-project-follow-cleanup nil)
+  (treemacs-directory-name-transformer    #'identity)
+  (treemacs-display-in-side-window        t)
+  (treemacs-eldoc-display                 t)
+  (treemacs-file-event-delay              5000)
+  ;(treemacs-file-extension-regex          treemacs-last-period-regex-value)
+  (treemacs-file-follow-delay             0.2)
+  (treemacs-file-name-transformer         #'identity)
+  (treemacs-follow-after-init             t)
+  (treemacs-git-command-pipe              "")
+  (treemacs-goto-tag-strategy             'refetch-index)
+  (treemacs-indentation                   2)
+  (treemacs-indentation-string            " ")
+  (treemacs-is-never-other-window         nil)
+  (treemacs-max-git-entries               5000)
+  (treemacs-missing-project-action        'ask)
+  (treemacs-no-png-images                 nil)
+  (treemacs-no-delete-other-windows       t)
+  (treemacs-project-follow-cleanup        nil)
+  (treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory))
+  (treemacs-position                      'left)
+  (treemacs-read-string-input             'from-minibuffer)
+  (treemacs-recenter-distance             0.1)
+  (treemacs-recenter-after-file-follow    nil)
+  (treemacs-recenter-after-tag-follow     nil)
+  (treemacs-recenter-after-project-jump   'always)
+  (treemacs-recenter-after-project-expand 'on-distance)
+  (treemacs-show-cursor                   t)
+  (treemacs-show-hidden-files             t)
+  (treemacs-silent-filewatch              nil)
+  (treemacs-silent-refresh                nil)
+  (treemacs-sorting                       'alphabetic-asc)
+  (treemacs-space-between-root-nodes      t)
+  (treemacs-tag-follow-cleanup            t)
+  (treemacs-tag-follow-delay              1.5)
+  (treemacs-user-mode-line-format         nil)
+  (treemacs-width                         45)
+(treemacs-follow-mode t)
+(treemacs-filewatch-mode t)
+(treemacs-fringe-indicator-mode 'always)
+(treemacs-git-mode 'deferred)
+
+  )
+
+
+(use-package treemacs-icons-dired
+  :ensure t
+  :hook (dired-mode . treemacs-icons-dired-mode)
+)
+
+(use-package treemacs-projectile
+  :ensure t
+  :after (treemacs projectile)
+)
+
+(use-package treemacs-magit
+  :ensure t
+  :after (treemacs magit)
+)
+
+(use-package treemacs-all-the-icons
+  :ensure t
+  :after treemacs
+)
+(provide 'treemacs-rcp)
+
+(add-hook 'emacs-startup-hook 'treemacs)
+
+;;(treemacs-load-theme 'Default)
+;;; Commentary:
+;;
+
+;; (setq projectile-switch-project-action 'neotree-projectile-action)
+
+;; Show matching parens
+
+
+
+
+(defun add-or-switch-project-dwim (dir)
+  "Let elisp do a few chores & set my hands free!"
+  (interactive (list (read-directory-name "Add to known projects: ")))
+  (projectile-add-known-project dir)
+  (find-file dir)
+  (treemacs-add-and-display-current-project))
+
+
+(defun treemacs--force-git-update-current-file ()
+  (-let [file (treemacs-canonical-path buffer-file-name)]
+    (treemacs-run-in-every-buffer
+     (when (treemacs-is-path file :in-workspace)
+       (treemacs-update-single-file-git-state file)))))
+
+(with-eval-after-load 'treemacs
+  (defun treemacs--force-refresh ()
+    "Forcely refreshes all the projects"
+    (treemacs-run-in-every-buffer
+       (treemacs-save-position
+        (dolist (project (treemacs-workspace->projects workspace))
+          (treemacs-project->refresh! project)))))
+  (add-hook 'after-save-hook 'treemacs--force-refresh))
+
+
+
 
 ;; Show matching parens
 (setq show-paren-delay 0)
