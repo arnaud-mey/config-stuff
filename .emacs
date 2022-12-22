@@ -10,7 +10,7 @@
     ad-do-it))
 (ad-activate 'align-regexp)
 
-
+(windmove-default-keybindings)
 
 (setq
    backup-by-copying t      ; don't clobber symlinks
@@ -45,6 +45,13 @@
 (require 'auto-complete-config)
 (ac-config-default)
 
+(add-to-list 'ac-modes 'terraform-mode)
+(require 'auto-complete)
+(global-auto-complete-mode t)
+
+(add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+
+
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 (add-to-list 'auto-mode-alist '("\\.sls\\'" . salt-mode))
 (require 'yaml-mode)
@@ -64,7 +71,7 @@
  ;; If there is more than one, they won't work right.
  '(inhibit-startup-screen t)
  '(package-selected-packages
-   '(undo-tree projectile gorepl-mode go-mode terraform-mode kubernetes magit diff-hl treemacs-evil treemacs which-key yaml-mode so-long puppet-mode neotree jedi find-file-in-project all-the-icons)))
+   '(go markdown-mode rego-mode dumb-jump undo-tree projectile gorepl-mode go-mode terraform-mode kubernetes magit diff-hl treemacs-evil treemacs which-key yaml-mode so-long puppet-mode neotree jedi find-file-in-project all-the-icons)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

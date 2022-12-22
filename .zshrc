@@ -33,8 +33,9 @@ export FZF_DEFAULT_OPTS='--no-height'
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export PATH="/Users/ameyer/Library/Python/3.8/bin:$PATH"
 
-export GOPATH="$HOME/basteln/golang"
-export GOROOT=/usr/lib/go
+export GOPATH="$HOME/code"
+
+
 
 source ~/.oh-my-zsh/oh-my-zsh.sh
 source /opt/homebrew/opt/fzf/shell/key-bindings.zsh
@@ -87,4 +88,10 @@ ppro_staging() {
 
 ppro_aslan_argon_dev() {
      okta_assume_template ppro_aslan_argon_dev
+}
+
+aws-ssh(){
+  instance_name=${1}
+  instance_id=$(aws ec2 describe-instances --filter "Name=private-dns-name,Values=${instance_name}" --query "Reservations[].Instances[?State.Name == 'running'].InstanceId[]" --output text)
+  aws ssm start-session --target ${instance_id}
 }
