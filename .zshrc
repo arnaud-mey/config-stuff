@@ -108,7 +108,7 @@ bindkey "\e\e[C" forward-word
 # autoload -Uz +X compinit && compinit
 # autoload -Uz +X bashcompinit && bashcompinit
 #
-# If you do not already have these lines, you must COPY the lines 
+# If you do not already have these lines, you must COPY the lines
 # above, place it OUTSIDE of the BEGIN/END_AWS_SSO_CLI markers
 # and of course uncomment it
 
@@ -136,6 +136,14 @@ aws-sso-clear() {
         return 1
     fi
     eval $(/usr/local/bin/aws-sso ${=_args} eval -c)
+}
+
+get_pw () {
+  security find-generic-password -ga "$1" -w
+}
+
+export_pw () {
+  export $1=$(get_pw $1)
 }
 
 compdef __aws_sso_profile_complete aws-sso-profile
