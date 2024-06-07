@@ -6,9 +6,13 @@ if ! [[ -d $ZSH_CACHE_DIR ]]; then
   mkdir $ZSH_CACHE_DIR
 fi
 ZSH_THEME="sunaku"
+RPROMPT='[%*]'
+
 export EDITOR="emacs"
 PATH="$PATH:$(ruby -e 'print Gem.user_dir')/bin"
+PATH="$PATH:$HOME/bin"
 export GEM_HOME=$HOME/.gem
+PATH="$HOMEBREW_PREFIX/opt/gnu-tar/libexec/gnubin:$PATH"
 
 HISTFILE=~/.histfile
 HISTSIZE=100000
@@ -46,7 +50,7 @@ source <(kubectl completion zsh)
 # End of lines configured by zsh-newuser-install
 alias ipdsh="noglob ipdsh"
 
-complete -C '/usr/local/bin/aws_completer' aws
+complete -C '/opt/homebrew/bin/aws_completer' aws
 
 py2() {
   sudo unlink /usr/local/bin/python ; sudo ln -s "${HOME}/.pyenv/versions/2.7.18/bin/python2.7" "/usr/local/bin/python"
@@ -114,7 +118,7 @@ bindkey "\e\e[C" forward-word
 
 __aws_sso_profile_complete() {
      local _args=${AWS_SSO_HELPER_ARGS:- -L error}
-    _multi_parts : "($(/usr/local/bin/aws-sso ${=_args} list --csv Profile))"
+    _multi_parts : "($(/opt/homebrew/bin/aws-sso ${=_args} list --csv Profile))"
 }
 
 aws-sso-profile() {
@@ -123,7 +127,7 @@ aws-sso-profile() {
         echo "Unable to assume a role while AWS_PROFILE is set"
         return 1
     fi
-    eval $(/usr/local/bin/aws-sso ${=_args} eval -p "$1")
+    eval $(/opt/homebrew/bin/aws-sso ${=_args} eval -p "$1")
     if [ "$AWS_SSO_PROFILE" != "$1" ]; then
         return 1
     fi
@@ -135,7 +139,7 @@ aws-sso-clear() {
         echo "AWS_SSO_PROFILE is not set"
         return 1
     fi
-    eval $(/usr/local/bin/aws-sso ${=_args} eval -c)
+    eval $(/opt/homebrew/bin/aws-sso ${=_args} eval -c)
 }
 
 get_pw () {
@@ -144,6 +148,16 @@ get_pw () {
 
 export_pw () {
   export $1=$(get_pw $1)
+}
+
+export_prod_gitlab() {
+   TOKEN=$(get_pw GITLAB_PROD_TOKEN)
+   export GITLAB_TOKEN=$TOKEN && export GITLAB_ACCESS_TOKEN=$TOKEN
+}
+
+export_test_gitlab() {
+   TOKEN=$(get_pw GITLAB_TEST_TOKEN)
+   export GITLAB_TOKEN=$TOKEN && export GITLAB_ACCESS_TOKEN=$TOKEN
 }
 
 compdef __aws_sso_profile_complete aws-sso-profile
